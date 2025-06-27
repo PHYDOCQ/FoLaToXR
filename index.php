@@ -250,237 +250,209 @@
     </div>
   </footer>
 
-  <script>
-    // ============= WARP EFFECT STARFIELD =============
-    const warpCanvas = document.getElementById('warpCanvas');
-    const warpCtx = warpCanvas.getContext('2d');
-    const warpText = document.getElementById('warpText');
-    const warpIndicator = document.getElementById('warpIndicator');
-    
-    // Set canvas size
-    function resizeCanvas() {
-      warpCanvas.width = window.innerWidth;
-      warpCanvas.height = window.innerHeight;
-    }
-    
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    // Starfield settings
-    const numStars = 1900;
-    const focalLength = warpCanvas.width * 2;
-    let centerX = warpCanvas.width / 2;
-    let centerY = warpCanvas.height / 2;
-    const baseTrailLength = 2;
-    const maxTrailLength = 30;
-    
-    // Stars array
-    let stars = [];
-    let warpSpeed = 0;
-    let animationActive = false;
-    
-    // Initialize stars
-    function initializeStars() {
-      stars = [];
-      for (let i = 0; i < numStars; i++) {
-        stars.push({
-          x: Math.random() * warpCanvas.width,
-          y: Math.random() * warpCanvas.height,
-          z: Math.random() * warpCanvas.width,
-          o: 0.5 + Math.random() * 0.5,
-          trail: []
-        });
+ <script>
+  // ============= WARP EFFECT STARFIELD =============
+  const warpCanvas = document.getElementById('warpCanvas');
+  const warpCtx = warpCanvas.getContext('2d');
+  const warpText = document.getElementById('warpText');
+  const warpIndicator = document.getElementById('warpIndicator');
+
+  function resizeCanvas() {
+    warpCanvas.width = window.innerWidth;
+    warpCanvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const numStars = 1900;
+  const focalLength = warpCanvas.width * 2;
+  let centerX = warpCanvas.width / 2;
+  let centerY = warpCanvas.height / 2;
+  const baseTrailLength = 2;
+  const maxTrailLength = 30;
+  
+  let stars = [];
+  let warpSpeed = 0;
+  let animationActive = false;
+
+  function initializeStars() {
+    stars = Array.from({ length: numStars }, () => ({
+      x: Math.random() * warpCanvas.width,
+      y: Math.random() * warpCanvas.height,
+      z: Math.random() * warpCanvas.width,
+      o: 0.5 + Math.random() * 0.5,
+      trail: []
+    }));
+  }
+
+  function moveStars() {
+    stars.forEach(star => {
+      const speed = 1 + warpSpeed * 50;
+      star.z -= speed;
+
+      if (star.z < 1) {
+        star.z = warpCanvas.width;
+        star.x = Math.random() * warpCanvas.width;
+        star.y = Math.random() * warpCanvas.height;
+        star.trail = [];
       }
-    }
-    
-    // Update star positions
-    function moveStars() {
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        const speed = 1 + warpSpeed * 50;
-        star.z -= speed;
-        
-        // Reset star position when it passes the viewer
-        if (star.z < 1) {
-          star.z = warpCanvas.width;
-          star.x = Math.random() * warpCanvas.width;
-          star.y = Math.random() * warpCanvas.height;
-          star.trail = [];
-        }
-      }
-    }
-    
-    // Draw stars and their trails
-    function drawStars() {
-      const clearAlpha = 1 - warpSpeed * 0.8;
-      warpCtx.fillStyle = `rgba(17,17,17,${clearAlpha})`;
-      warpCtx.fillRect(0, 0, warpCanvas.width, warpCanvas.height);
-      
-      const trailLength = Math.floor(
-        baseTrailLength + warpSpeed * (maxTrailLength - baseTrailLength)
-      );
-      
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        const px = (star.x - centerX) * (focalLength / star.z) + centerX;
-        const py = (star.y - centerY) * (focalLength / star.z) + centerY;
-        
-        star.trail.push({ x: px, y: py });
-        if (star.trail.length > trailLength) {
-          star.trail.shift();
-        }
-        
-        if (star.trail.length > 1) {
-          warpCtx.beginPath();
-          warpCtx.moveTo(star.trail[0].x, star.trail[0].y);
-          for (let j = 1; j < star.trail.length; j++) {
-            warpCtx.lineTo(star.trail[j].x, star.trail[j].y);
-          }
-          warpCtx.strokeStyle = `rgba(209,255,255,${star.o})`;
-          warpCtx.lineWidth = 1;
-          warpCtx.stroke();
-        }
-        
-        warpCtx.fillStyle = `rgba(209,255,255,${star.o})`;
-        warpCtx.fillRect(px, py, 1.5, 1.5);
-      }
-    }
-    
-    // Animation loop
-    function animateWarp() {
-      if (animationActive) {
-        requestAnimationFrame(animateWarp);
-        moveStars();
-        drawStars();
-      }
-    }
-    
-    // Start warp effect
-    function startWarpEffect(action) {
-      warpIndicator.textContent = action === 'login' 
-        ? "Login warp sequence activated" 
-        : "Registration warp sequence activated";
-      warpIndicator.classList.add('show');
-      
-      warpCanvas.classList.add('active');
-      warpText.textContent = action === 'login' 
-        ? "LOGIN WARP ENGAGED" 
-        : "REGISTRATION WARP ENGAGED";
-      warpText.classList.add('active');
-      
-      initializeStars();
-      animationActive = true;
-      animateWarp();
-      
-      const warpTimeline = gsap.timeline({
-        onComplete: () => {
-          setTimeout(() => {
-            warpCanvas.classList.remove('active');
-            warpText.classList.remove('active');
-            warpIndicator.classList.remove('show');
-            warpSpeed = 0;
-            animationActive = false;
-          }, 500);
-        }
-      });
-      
-      warpTimeline
-        .to({}, {
-          duration: 1,
-          onUpdate: function() {
-            warpSpeed = this.progress() * 0.8;
-          }
-        })
-        .to({}, {
-          duration: 1.5,
-          onUpdate: function() {
-            warpSpeed = 0.8 + this.progress() * 0.2;
-          }
-        })
-        .to(warpText, {
-          opacity: 0,
-          filter: 'blur(20px)',
-          duration: 0.5
-        }, '-=0.5');
-    }
-
-    // ============= BUTTON RANDOM MOVING AND WARP EFFECT =============
-    let loginClickCount = 0;
-    let registerClickCount = 0;
-    const totalClicksBeforeWarp = 10;
-
-    function moveButtonRandomly(button) {
-      const container = document.querySelector('.main-content');
-      const buttonRect = button.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-
-      // Menghitung batas area dimana tombol dapat bergerak
-      const maxX = containerRect.width - buttonRect.width;
-      const maxY = containerRect.height - buttonRect.height;
-
-       // Generate random x and y offsets
-      const randomX = (Math.random() - 0.5) * 300; // Random value between -150 and 150
-      const randomY = (Math.random() - 0.5) * 300; // Random value between -150 and 150
-
-      button.style.transform = `translate(${randomX}px, ${randomY}px)`;
-    }
-
-    function prepareWarpEffect(action) {
-      const loginButton = document.getElementById('loginButton');
-      const registerButton = document.getElementById('registerButton');
-      
-      // Reset posisi tombol ke posisi awal
-      loginButton.style.transform = `translate(0, 0)`;
-      registerButton.style.transform = `translate(0, 0)`;
-      
-      // Mulai efek warp
-      startWarpEffect(action);
-    }
-
-    window.addEventListener('load', () => {
-      const loginButton = document.getElementById('loginButton');
-      const registerButton = document.getElementById('registerButton');
-
-      // Event listener untuk tombol login
-      loginButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          loginClickCount++;
-
-          moveButtonRandomly(loginButton);
-
-          // Cek jika sudah 10 kali klik
-          if (loginClickCount >= totalClicksBeforeWarp) {
-              prepareWarpEffect('login');
-              loginClickCount = 0; // Reset hitungan klik
-          }
-      });
-
-      // Event listener untuk tombol register
-      registerButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          registerClickCount++;
-
-          moveButtonRandomly(registerButton);
-
-          // Cek jika sudah 10 kali klik
-          if (registerClickCount >= totalClicksBeforeWarp) {
-              prepareWarpEffect('register');
-              registerClickCount = 0; // Reset hitungan klik
-          }
-      });
-
-      // Initialize stars
-      initializeStars();
-      
-      // Hide loading overlay after delay
-      setTimeout(() => {
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-          loadingOverlay.style.display = 'none';
-        }
-      }, 2000);
     });
-  </script>
+  }
+
+  function drawStars() {
+    const clearAlpha = 1 - warpSpeed * 0.8;
+    warpCtx.fillStyle = `rgba(17,17,17,${clearAlpha})`;
+    warpCtx.fillRect(0, 0, warpCanvas.width, warpCanvas.height);
+  
+    const trailLength = Math.floor(baseTrailLength + warpSpeed * (maxTrailLength - baseTrailLength));
+  
+    stars.forEach(star => {
+      const px = (star.x - centerX) * (focalLength / star.z) + centerX;
+      const py = (star.y - centerY) * (focalLength / star.z) + centerY;
+      
+      star.trail.push({ x: px, y: py });
+      if (star.trail.length > trailLength) {
+        star.trail.shift();
+      }
+  
+      if (star.trail.length > 1) {
+        warpCtx.beginPath();
+        warpCtx.moveTo(star.trail[0].x, star.trail[0].y);
+        star.trail.forEach((point, j) => {
+          if (j > 0) warpCtx.lineTo(point.x, point.y);
+        });
+        warpCtx.strokeStyle = `rgba(209,255,255,${star.o})`;
+        warpCtx.lineWidth = 1;
+        warpCtx.stroke();
+      }
+  
+      warpCtx.fillStyle = `rgba(209,255,255,${star.o})`;
+      warpCtx.fillRect(px, py, 1.5, 1.5);
+    });
+  }
+
+  function animateWarp() {
+    if (animationActive) {
+      requestAnimationFrame(animateWarp);
+      moveStars();
+      drawStars();
+    }
+  }
+
+  function startWarpEffect(action) {
+    warpIndicator.textContent = action === 'login' 
+      ? "Login warp sequence activated" 
+      : "Registration warp sequence activated";
+    warpIndicator.classList.add('show');
+  
+    warpCanvas.classList.add('active');
+    warpText.textContent = action === 'login' 
+      ? "LOGIN WARP ENGAGED" 
+      : "REGISTRATION WARP ENGAGED";
+    warpText.classList.add('active');
+  
+    initializeStars();
+    animationActive = true;
+    animateWarp();
+  
+    const warpTimeline = gsap.timeline({
+      onComplete: () => {
+        setTimeout(() => {
+          warpCanvas.classList.remove('active');
+          warpText.classList.remove('active');
+          warpIndicator.classList.remove('show');
+          warpSpeed = 0;
+          animationActive = false;
+        }, 500);
+      }
+    });
+  
+    warpTimeline
+      .to({}, {
+        duration: 1,
+        onUpdate: function() {
+          warpSpeed = this.progress() * 0.8;
+        }
+      })
+      .to({}, {
+        duration: 1.5,
+        onUpdate: function() {
+          warpSpeed = 0.8 + this.progress() * 0.2;
+        }
+      })
+      .to(warpText, {
+        opacity: 0,
+        filter: 'blur(20px)',
+        duration: 0.5
+      }, '-=0.5');
+  }
+
+  let loginClickCount = 0;
+  let registerClickCount = 0;
+  const totalClicksBeforeWarp = 10;
+
+  function moveButtonRandomly(button) {
+    const container = document.querySelector('.main-content');
+    const buttonRect = button.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+  
+    const maxX = containerRect.width - buttonRect.width;
+    const maxY = containerRect.height - buttonRect.height;
+
+    const randomX = (Math.random() - 0.5) * 300; 
+    const randomY = (Math.random() - 0.5) * 300; 
+  
+    button.style.transform = `translate(${randomX}px, ${randomY}px)`;
+  }
+
+  function prepareWarpEffect(action) {
+    const loginButton = document.getElementById('loginButton');
+    const registerButton = document.getElementById('registerButton');
+    
+    loginButton.style.transform = `translate(0, 0)`;
+    registerButton.style.transform = `translate(0, 0)`;
+    
+    startWarpEffect(action);
+  }
+
+  const handleClick = (action, button) => {
+    loginClickCount += action === 'login' ? 1 : 0;
+    registerClickCount += action === 'register' ? 1 : 0;
+
+    moveButtonRandomly(button);
+
+    if ((action === 'login' && loginClickCount >= totalClicksBeforeWarp) || (action === 'register' && registerClickCount >= totalClicksBeforeWarp)) {
+      prepareWarpEffect(action);
+      if (action === 'login') loginClickCount = 0;
+      else registerClickCount = 0;
+    }
+  };
+
+  window.addEventListener('load', () => {
+    const loginButton = document.getElementById('loginButton');
+    const registerButton = document.getElementById('registerButton');
+
+    loginButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleClick('login', loginButton);
+    });
+
+    registerButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleClick('register', registerButton);
+    });
+
+    initializeStars();
+
+    setTimeout(() => {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+      }
+    }, 2000);
+  });
+</script>
 </body>
 </html>
 

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -47,12 +48,6 @@
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
     </svg>
   </div>
-
-  <header class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 py-5 flex items-center justify-center">
-      <h1 class="text-2xl font-bold text-blue-600 select-none">FoLaToXR</h1>
-    </div>
-  </header>
 
   <main class="flex-grow flex items-center justify-center px-4 py-10">
     <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
@@ -107,43 +102,12 @@
       </form>
       <p class="mt-6 text-center text-gray-600 text-sm">
         Don't have an account?
-        <a href="index.html" class="text-blue-600 hover:underline font-semibold">Register</a>
+        <a href="register/index.php" class="text-blue-600 hover:underline font-semibold">Register</a>
       </p>
     </div>
   </main>
 
-  <footer class="bg-white border-t border-gray-200">
-    <div class="max-w-7xl mx-auto py-4 px-4 flex flex-col sm:flex-row items-center justify-between">
-      <p class="text-gray-500 text-sm font-medium">© 2024 FoLaToXR. All rights reserved.</p>
-      <div class="flex space-x-6 mt-3 sm:mt-0">
-        <a href="#" aria-label="Facebook" class="text-gray-400 hover:text-blue-600 transition">
-          <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="#" aria-label="Twitter" class="text-gray-400 hover:text-blue-400 transition">
-          <i class="fab fa-twitter"></i>
-        </a>
-        <a href="#" aria-label="Instagram" class="text-gray-400 hover:text-pink-500 transition">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="#" aria-label="LinkedIn" class="text-gray-400 hover:text-blue-700 transition">
-          <i class="fab fa-linkedin-in"></i>
-        </a>
-      </div>
-    </div>
-  </footer>
-
- <script>
-    // Simulate loading for 2 seconds then hide the loading overlay
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-          loadingOverlay.style.display = 'none';
-        }
-      }, 2000);
-    });
-
-    // Toggle password visibility
+  <script>
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const eyeIcon = togglePassword.querySelector('i');
